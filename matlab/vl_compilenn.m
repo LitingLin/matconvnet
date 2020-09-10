@@ -337,26 +337,44 @@ if opts.debug
   flags.base{end+1} = '-g' ;
   flags.base{end+1} = '-DDEBUG' ;
 else
-  flags.base{end+1} = '-O3' ;
   flags.base{end+1} = '-DNDEBUG' ;
 end
 
 % MEX: Additional flags passed to `mex` for compiling C++
 % code. CXX and CXXOPTIOM are passed directly to the encapsualted compiler.
-flags.mex = {'-largeArrayDims'} ;
+if verLessThan('matlab','9,4')
+  flags.mex = {'-largeArrayDims'} ;
+else
+  flags.mex = {} ;
+end
+if ~opts.debug
+  flags.mex{end+1} = '-O' ;
+end
 flags.cxx = {} ;
 flags.cxxoptim = {} ;
 if ~isempty(opts.mexConfig), flags.mex = horzcat(flags.mex, {'-f', opts.mexConfig}) ; end
 
 % MEX: Additional flags passed to `mex` for compiling CUDA
 % code. CXX and CXXOPTIOM are passed directly to the encapsualted compiler.
-flags.mexcuda = {'-largeArrayDims'} ;
+if verLessThan('matlab','9,4')
+  flags.mexcuda = {'-largeArrayDims'} ;
+else
+  flags.mexcuda = {} ;
+end
+if ~opts.debug
+  flags.mexcuda{end+1} = '-O3' ;
+end
 flags.mexcuda_cxx = {} ;
 flags.mexcuda_cxxoptim = {} ;
 if ~isempty(opts.mexCudaConfig), flags.mexcuda = horzcat(flags.mexcuda, {'-f', opts.mexCudaConfig}) ; end
 
 % MEX_LINK: Additional flags passed to `mex` for linking.
-flags.mexlink = {'-largeArrayDims','-lmwblas'} ;
+if verLessThan('matlab','9,4')
+  flags.mexlink = {'-largeArrayDims'} ;
+else
+  flags.mexlink = {'-R2018a'} ;
+end
+flags.mexlink{end+1} = '-lmwblas' ;
 flags.mexlink_ldflags = {} ;
 flags.mexlink_ldoptimflags = {} ;
 flags.mexlink_linklibs = {} ;
